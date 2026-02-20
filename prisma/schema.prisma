@@ -51,18 +51,18 @@ model Organisation {
 }
 
 model User {
-  id             String         @id @default(cuid())
-  email          String         @unique
-  passwordHash   String
-  name           String
-  role           Role           @default(MEMBER)
-  organisationId String
-  organisation   Organisation   @relation(fields: [organisationId], references: [id], onDelete: Cascade)
-  refreshToken   RefreshToken[]
-  actionPerfomed Activity[]     @relation("ActivityActor")
-  actionRecived  Activity[]     @relation("ActivityTarget")
-  createdAt      DateTime       @default(now())
-  updatedAt      DateTime       @updatedAt
+  id              String         @id @default(cuid())
+  email           String         @unique
+  passwordHash    String
+  name            String
+  role            Role           @default(MEMBER)
+  organisationId  String
+  organisation    Organisation   @relation(fields: [organisationId], references: [id], onDelete: Cascade)
+  refreshToken    RefreshToken[]
+  actionPerformed Activity[]     @relation("ActivityActor")
+  actionReceived  Activity[]     @relation("ActivityTarget")
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
 
   @@index([organisationId])
   @@index([email])
