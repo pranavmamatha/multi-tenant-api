@@ -1,6 +1,6 @@
 import { Context, Next } from "hono"
-import { ApiError } from "../config/ApiError"
-import { verifyAccessToken } from "../config/jwt"
+import { ApiError } from "../utils/ApiError"
+import { verifyAccessToken } from "../utils/jwt"
 import { AppVariables } from "../types/hono"
 
 export const authMiddleware = async (c: Context<{ Variables: AppVariables }>, next: Next) => {

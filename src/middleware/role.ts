@@ -1,5 +1,5 @@
 import { Context, Next } from "hono"
-import { ApiError } from "../config/ApiError"
+import { ApiError } from "../utils/ApiError"
 import { Role } from "../generated/prisma/client"
 import { AppVariables } from "../types/hono"
 

@@ -1,6 +1,6 @@
 import { Context } from "hono"
-import { ApiError } from "../config/ApiError"
-import { sendError } from "../config/response"
+import { ApiError } from "../utils/ApiError"
+import { sendError } from "../utils/response"
 import { ContentfulStatusCode } from "hono/utils/http-status"
 
 export const errorHandler = (err: Error, c: Context) => {
