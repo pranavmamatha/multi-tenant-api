@@ -1,7 +1,8 @@
 import { Context, Next } from "hono"
 import { ApiError } from "../utils/ApiError"
-import { Role } from "../generated/prisma/client"
 import { AppVariables } from "../types/hono"
+
+type Role = "ADMIN" | "MEMBER"
 
 export const requireRole = (...roles: Role[]) => {
   return async (c: Context<{ Variables: AppVariables }>, next: Next) => {

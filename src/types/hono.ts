@@ -1,4 +1,4 @@
-import { Role } from "../generated/prisma/client"
+type Role = "ADMIN" | "MEMBER"
 
 export type AppVariables = {
   userId: string

@@ -1,8 +1,9 @@
 import * as jwt from "jsonwebtoken"
 import { env } from "../config/env"
 import type { StringValue } from "ms"
-import { Role } from "../generated/prisma/client"
 import { ApiError } from "./ApiError"
+
+type Role = "ADMIN" | "MEMBER"
 
 export type JwtPayload = {
   userId: string
