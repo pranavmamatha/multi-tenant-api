@@ -7,9 +7,10 @@ import activityRouter from "./modules/activity/activity.routes"
 import { env } from "./config/env"
 import { verifyAccessToken } from "./utils/jwt"
 import { wsManager, WsData } from "./websocket/wsManager"
+import { logger } from "hono/logger"
 
 const app = new Hono()
-
+app.use("*", logger())
 // ─────────────────────────────────────────
 // ROUTES
 // ─────────────────────────────────────────
