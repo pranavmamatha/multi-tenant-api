@@ -1,6 +1,6 @@
 # Multi-Tenant SaaS API
 
-A multi-tenant, subscription-based SaaS backend with real-time WebSocket notifications built with **Bun**, **Hono**, **Drizzle ORM**, and **PostgreSQL**.
+A production-ready multi-tenant, subscription-based SaaS backend with real-time WebSocket notifications built with **Bun**, **Hono**, **Drizzle ORM**, and **PostgreSQL**.
 
 ---
 
