@@ -3,7 +3,7 @@ import { db } from "../../db/index"
 import { organisations, activities } from "../../db/schema"
 import { ApiError } from "../../utils/ApiError"
 import { UpgradePlanInput } from "./org.schema"
-
+import { wsManager } from "../../websocket/wsManager"
 // ─────────────────────────────────────────
 // PLAN LIMITS
 // ─────────────────────────────────────────
@@ -61,6 +61,14 @@ export const upgradePlanService = async (
     .where(eq(organisations.id, organisationId))
     .returning()
 
+  wsManager.broadcast(organisationId, {
+    type: "PLAN_UPGRADED",
+    payload: {
+      from: org.subscriptionPlan,
+      to: input.plan,
+      upgradedAt: new Date().toISOString()
+    }
+  })
   // log activity
   await db.insert(activities).values({
     organisationId,
@@ -87,6 +95,15 @@ export const broadcastService = async (
     type: "BROADCAST_MESSAGE",
     message
   }).returning()
+
+  wsManager.broadcast(organisationId, {
+    type: "BROADCAST_MESSAGE",
+    payload: {
+      message,
+      sentBy: actorId,
+      sentAt: new Date().toISOString()
+    }
+  })
 
   return activity[0]
 }
