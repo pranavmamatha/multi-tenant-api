@@ -111,7 +111,7 @@ cd multi-tenant-api
 # 2. Copy environment variables
 cp .env.example .env
 
-# 3. Update .env with your secrets (see Environment Variables section)
+# 3. Update .env with your secrets
 
 # 4. Start everything
 docker-compose up --build
@@ -208,29 +208,107 @@ POSTGRES_DB=multitenant
 
 ---
 
+## Swagger API Documentation
+
+This project includes full interactive API documentation powered by **Swagger UI** and **OpenAPI 3.0**.
+
+### Accessing the Docs
+
+Once the server is running, open your browser and go to:
+
+```
+http://localhost:3000/docs
+```
+
+The raw OpenAPI JSON spec is also available at:
+
+```
+http://localhost:3000/docs/spec
+```
+
+### How to Authenticate in Swagger
+
+Most endpoints require a Bearer token. Here's how to authenticate directly in the Swagger UI:
+
+**Step 1** — Expand `POST /api/auth/login`, click **Try it out**, fill in your email and password, and click **Execute**.
+
+**Step 2** — Copy the `accessToken` from the response body.
+
+**Step 3** — Click the **Authorize** 🔒 button at the top of the page.
+
+**Step 4** — In the value field type `Bearer ` followed by your token:
+```
+Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+```
+
+**Step 5** — Click **Authorize** then **Close**. All protected endpoints will now automatically send your token.
+
+### What's Documented
+
+| Tag | Endpoints |
+|---|---|
+| Auth | Register, Login, Refresh, Logout |
+| Organisations | Get org, Upgrade plan, Broadcast |
+| Users | List, Invite, Accept invite, Remove |
+| Activity | Activity feed |
+| WebSocket | WS connection details |
+
+### Notes
+
+- Endpoints marked with 🔒 require authentication
+- Endpoints marked with **Admin only** will return `403` if called by a Member
+- The `/ws` WebSocket endpoint is documented for reference only — it cannot be tested via Swagger (use the HTML tester below)
+- Rate limit headers are visible in every response under **Response headers** in Swagger UI:
+  - `ratelimit-limit` — max requests allowed
+  - `ratelimit-remaining` — requests left in the current window
+  - `ratelimit-reset` — seconds until the window resets
+
+---
+
 ## WebSocket Events
 
-Connect with a valid access token as a query parameter:
-
-```js
-const ws = new WebSocket("ws://localhost:3000/ws?token=YOUR_ACCESS_TOKEN")
-ws.onmessage = (e) => console.log(JSON.parse(e.data))
-```
+Connect with a valid access token as a query parameter. Events are broadcast to all connected members in the same organisation.
 
 ### Event Types
 
 ```json
-// User joined the organisation
-{ "type": "USER_JOINED", "payload": { "userId": "...", "name": "...", "email": "...", "role": "..." } }
-
-// Subscription plan upgraded
-{ "type": "PLAN_UPGRADED", "payload": { "from": "FREE", "to": "PRO", "upgradedAt": "..." } }
-
-// Admin broadcast message
+{ "type": "USER_JOINED",       "payload": { "userId": "...", "name": "...", "email": "...", "role": "..." } }
+{ "type": "PLAN_UPGRADED",     "payload": { "from": "FREE", "to": "PRO", "upgradedAt": "..." } }
 { "type": "BROADCAST_MESSAGE", "payload": { "message": "...", "sentBy": "...", "sentAt": "..." } }
+{ "type": "USER_REMOVED",      "payload": { "userId": "...", "removedBy": "..." } }
+```
 
-// User removed from organisation
-{ "type": "USER_REMOVED", "payload": { "userId": "...", "removedBy": "..." } }
+### WebSocket Testing
+
+Save the following as a `.html` file, open it in your browser, paste a fresh access token and click Connect:
+
+```html
+<!DOCTYPE html>
+<html>
+<head><title>WS Tester</title></head>
+<body>
+  <h3>WebSocket Tester</h3>
+  <input id="token" placeholder="Paste access token here" style="width:500px" />
+  <button onclick="connect()">Connect</button>
+  <button onclick="ws && ws.close()">Disconnect</button>
+  <pre id="log" style="background:#111;color:#0f0;padding:16px;margin-top:12px;height:400px;overflow-y:auto"></pre>
+
+  <script>
+    let ws
+    const log = (msg) => {
+      document.getElementById("log").textContent += msg + "\n"
+    }
+    function connect() {
+      const token = document.getElementById("token").value
+      ws = new WebSocket(`ws://localhost:3000/ws?token=${token}`)
+      ws.onopen = () => log("✅ Connected")
+      ws.onmessage = (e) => log("📨 " + e.data)
+      ws.onclose = () => log("❌ Disconnected")
+      ws.onerror = () => log("🔴 Error")
+    }
+  </script>
+</body>
+</html>
 ```
 
 ---
@@ -274,15 +352,3 @@ Enforced at the service layer before every invite — the member count is checke
 | Access token in WS query param | Simpler than custom headers, but token appears in server logs |
 | Single org per user | Simpler architecture, but users can't belong to multiple orgs |
 | No email service | Invite tokens are returned in API response instead of sent via email |
-
----
-
-## Swagger Documentation
-
-Full interactive API documentation available at:
-
-```
-http://localhost:3000/docs
-```
-
-Click **Authorize**, paste your Bearer token from the login response, and test all endpoints directly from the UI.
