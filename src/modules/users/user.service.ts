@@ -5,6 +5,7 @@ import { ApiError } from "../../utils/ApiError"
 import * as bcrypt from "bcryptjs"
 import { PLAN_LIMITS } from "../organisations/org.service"
 import { InviteUserInput, AcceptInviteInput } from "./user.schema"
+import { wsManager } from "../../websocket/wsManager"
 
 // ─────────────────────────────────────────
 // GET ALL USERS IN ORG
@@ -138,6 +139,15 @@ export const acceptInviteService = async (input: AcceptInviteInput) => {
     return user
   })
 
+  wsManager.broadcast(invite.organisationId, {
+    type: "USER_JOINED",
+    payload: {
+      userId: result.id,
+      name: result.name,
+      email: result.email,
+      role: result.role
+    }
+  })
   // log activity
   await db.insert(activities).values({
     organisationId: invite.organisationId,
