@@ -8,9 +8,33 @@ import { env } from "./config/env"
 import { verifyAccessToken } from "./utils/jwt"
 import { wsManager, WsData } from "./websocket/wsManager"
 import { logger } from "hono/logger"
+import { rateLimiter } from "hono-rate-limiter"
 
 const app = new Hono()
+
+// ─────────────────────────────────────────
+// GLOBAL MIDDLEWARE
+// ─────────────────────────────────────────
+
+// request logging
 app.use("*", logger())
+
+// rate limiting — 100 requests per minute per IP
+app.use("*", rateLimiter({
+  windowMs: 60 * 1000,  // 1 minute
+  limit: 100,
+  keyGenerator: (c) => c.req.header("x-forwarded-for") ?? c.req.header("x-real-ip") ?? "unknown",
+  message: { success: false, message: "Too many requests, please slow down", data: null }
+}))
+
+// stricter limit on auth routes — 10 requests per minute
+app.use("/api/auth/*", rateLimiter({
+  windowMs: 60 * 1000,
+  limit: 10,
+  keyGenerator: (c) => c.req.header("x-forwarded-for") ?? c.req.header("x-real-ip") ?? "unknown",
+  message: { success: false, message: "Too many auth attempts, please try again later", data: null }
+}))
+
 // ─────────────────────────────────────────
 // ROUTES
 // ─────────────────────────────────────────
