@@ -9,6 +9,8 @@ import { verifyAccessToken } from "./utils/jwt"
 import { wsManager, WsData } from "./websocket/wsManager"
 import { logger } from "hono/logger"
 import { rateLimiter } from "hono-rate-limiter"
+import { swaggerUI } from "@hono/swagger-ui"
+import { swaggerSpec } from "./config/swagger"
 
 const app = new Hono()
 
@@ -45,6 +47,9 @@ app.route("/api/organisations", orgRouter)
 app.route("/api/users", userRouter)
 app.route("/api/activities", activityRouter)
 
+
+app.get("/docs", swaggerUI({ url: "/docs/spec" }))
+app.get("/docs/spec", (c) => c.json(swaggerSpec))
 // ─────────────────────────────────────────
 // ERROR HANDLER
 // ─────────────────────────────────────────
