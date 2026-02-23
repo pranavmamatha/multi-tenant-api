@@ -105,7 +105,7 @@ Organisation
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/your-username/multi-tenant-api.git
+git clone https://github.com/pranavmamatha/multi-tenant-api.git
 cd multi-tenant-api
 
 # 2. Copy environment variables
@@ -124,7 +124,7 @@ Swagger docs at `http://localhost:3000/docs`
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/your-username/multi-tenant-api.git
+git clone https://github.com/pranavmamatha/multi-tenant-api.git
 cd multi-tenant-api
 
 # 2. Install dependencies
